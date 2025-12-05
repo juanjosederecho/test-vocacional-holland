@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Orientación Vocacional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- PANTALLA DE INICIO -->
+        <section id="start-screen" class="screen active">
+            <div class="logo-area">
+                <span class="icon">🎓</span>
+                <h1>Test Vocacional</h1>
+                <p>Descubre tu futuro profesional</p>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Ingresa tu nombre..." autocomplete="off">
+                <button id="start-btn" class="btn-primary">¡EMPEZAR!</button>
+            </div>
+        </section>
+
+        <!-- PANTALLA DE PREGUNTAS -->
+        <section id="quiz-screen" class="screen hidden">
+            <div class="header-bar">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="question-counter">
+                    <span id="current-question-num">1</span> / 20
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h2 id="question-text">Pregunta aquí...</h2>
+            </div>
+
+            <div class="answers-grid">
+                <button class="answer-btn red" data-value="1">
+                    <div class="shape">▲</div>
+                    <span class="text">Nunca</span>
+                </button>
+                <button class="answer-btn blue" data-value="2">
+                    <div class="shape">◆</div>
+                    <span class="text">A veces</span>
+                </button>
+                <button class="answer-btn yellow" data-value="3">
+                    <div class="shape">●</div>
+                    <span class="text">Frecuentemente</span>
+                </button>
+                <button class="answer-btn green" data-value="4">
+                    <div class="shape">■</div>
+                    <span class="text">Siempre</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA DE RESULTADOS -->
+        <section id="result-screen" class="screen hidden">
+            <div class="result-header">
+                <h1>¡Felicidades, <span id="result-name">Nombre</span>!</h1>
+                <p>Tu perfil vocacional indica que tienes una gran afinidad con:</p>
+            </div>
+
+            <div class="result-card">
+                <div class="medal">🏆</div>
+                <h2 id="top-area">Área Resultante</h2>
+                <div class="careers-list">
+                    <h3>Carreras Sugeridas:</h3>
+                    <ul id="careers-suggestions">
+                        <!-- Lista dinámica -->
+                    </ul>
+                </div>
+            </div>
+
+            <button id="restart-btn" class="btn-secondary">Volver a intentar</button>
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
