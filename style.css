@@ -1,5 +1,6 @@
 :root {
-    --bg-color: #46178f; /* Kahoot purple */
+    --bg-color: #46178f;
+    /* Kahoot purple */
     --card-bg: #ffffff;
     --text-color: #333;
     --btn-red: #e21b3c;
@@ -18,7 +19,11 @@
 body {
     font-family: var(--font-main);
     background-color: var(--bg-color);
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235c24b5' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    /* Fondo de Puno (Lago Titicaca / Uros) */
+    background-image: linear-gradient(rgba(70, 23, 143, 0.8), rgba(70, 23, 143, 0.8)), url("https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Uros_Islands_Lake_Titicaca_Puno_Peru.jpg/1920px-Uros_Islands_Lake_Titicaca_Puno_Peru.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: white;
     height: 100vh;
     display: flex;
@@ -73,7 +78,7 @@ body {
 .logo-area h1 {
     font-size: 3rem;
     font-weight: 900;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
 }
 
 .input-group {
@@ -91,7 +96,7 @@ input[type="text"] {
     font-size: 1.2rem;
     text-align: center;
     font-family: var(--font-main);
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary {
@@ -123,7 +128,7 @@ input[type="text"] {
 
 .progress-container {
     flex-grow: 1;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
     height: 10px;
     border-radius: 10px;
     margin-right: 15px;
@@ -139,7 +144,7 @@ input[type="text"] {
 
 .question-counter {
     font-weight: 700;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     padding: 5px 10px;
     border-radius: 15px;
 }
@@ -152,7 +157,7 @@ input[type="text"] {
     width: 100%;
     text-align: center;
     margin-bottom: 30px;
-    box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
     min-height: 200px;
     display: flex;
     align-items: center;
@@ -186,7 +191,7 @@ input[type="text"] {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
     transition: transform 0.1s, filter 0.1s;
 }
 
@@ -203,10 +208,21 @@ input[type="text"] {
     font-size: 2rem;
 }
 
-.answer-btn.red { background-color: var(--btn-red); }
-.answer-btn.blue { background-color: var(--btn-blue); }
-.answer-btn.yellow { background-color: var(--btn-yellow); }
-.answer-btn.green { background-color: var(--btn-green); }
+.answer-btn.red {
+    background-color: var(--btn-red);
+}
+
+.answer-btn.blue {
+    background-color: var(--btn-blue);
+}
+
+.answer-btn.yellow {
+    background-color: var(--btn-yellow);
+}
+
+.answer-btn.green {
+    background-color: var(--btn-green);
+}
 
 /* RESULT SCREEN */
 .result-header {
@@ -221,7 +237,7 @@ input[type="text"] {
     border-radius: 15px;
     width: 100%;
     text-align: center;
-    box-shadow: 0 10px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.2);
     margin-bottom: 30px;
     animation: popUp 0.5s ease;
 }
@@ -266,20 +282,40 @@ input[type="text"] {
     font-weight: 700;
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 /* ANIMATIONS */
 @keyframes bounceIn {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.05); }
-    70% { transform: scale(0.9); }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    70% {
+        transform: scale(0.9);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 @keyframes popUp {
-    0% { transform: translateY(50px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* RESPONSIVE */
@@ -287,9 +323,11 @@ input[type="text"] {
     .answers-grid {
         grid-template-columns: 1fr;
     }
+
     .question-card h2 {
         font-size: 1.4rem;
     }
+
     .logo-area h1 {
         font-size: 2.2rem;
     }
