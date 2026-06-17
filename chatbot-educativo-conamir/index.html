@@ -1,0 +1,1215 @@
+<!doctype html>
+<!--
+  Chatbot Educativo CONAMIR
+  Archivo unico: HTML + CSS + JavaScript.
+
+  IMPORTANTE:
+  - No pegues una API Key directamente en este codigo.
+  - La clave se escribe en la ventana de configuracion de la app.
+  - Para uso real con muchos estudiantes, lo mas seguro es usar un servidor intermedio
+    que proteja la API Key. Esta version cumple el requisito de funcionar como una sola
+    pagina HTML lista para GitHub Pages.
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>Chatbot Educativo CONAMIR</title>
+
+  <style>
+    /*
+      =============================
+      1. Variables visuales globales
+      =============================
+      Se usan variables CSS para mantener colores, sombras y radios consistentes.
+    */
+    :root {
+      --bg-1: #eff6ff;
+      --bg-2: #ecfeff;
+      --bg-3: #fff7ed;
+      --ink: #102033;
+      --muted: #607084;
+      --line: #d9e5ef;
+      --panel: rgba(255, 255, 255, 0.92);
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --cyan: #0891b2;
+      --green: #16a34a;
+      --yellow: #f59e0b;
+      --red: #dc2626;
+      --bubble-user: #2563eb;
+      --bubble-bot: #ffffff;
+      --shadow: 0 24px 70px rgba(15, 35, 60, 0.18);
+      --radius: 16px;
+      --safe-bottom: max(14px, env(safe-area-inset-bottom));
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    }
+
+    /*
+      =============================
+      2. Reset basico
+      =============================
+      Evita diferencias grandes entre navegadores y mejora el toque en celulares.
+    */
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(37, 99, 235, 0.20), transparent 28rem),
+        radial-gradient(circle at 100% 10%, rgba(8, 145, 178, 0.18), transparent 26rem),
+        linear-gradient(140deg, var(--bg-1), var(--bg-2) 48%, var(--bg-3));
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /*
+      =============================
+      3. Estructura principal
+      =============================
+      La app ocupa toda la pantalla, con maximo ancho agradable en computadora.
+    */
+    .app-shell {
+      width: min(100%, 980px);
+      height: 100%;
+      margin: 0 auto;
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid rgba(217, 229, 239, 0.92);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 32px rgba(15, 35, 60, 0.10);
+      padding: 12px;
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.28);
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.15rem, 4.8vw, 2rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+      color: #12345a;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    /*
+      =============================
+      4. Botones e inputs
+      =============================
+      Controles grandes para que sean faciles de tocar en Android.
+    */
+    .btn {
+      min-height: 44px;
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+      color: #ffffff;
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
+    }
+
+    .btn-soft {
+      background: #eef6ff;
+      color: #174174;
+      border: 1px solid #d4e6ff;
+    }
+
+    .btn-danger {
+      background: #fff1f2;
+      color: #991b1b;
+      border: 1px solid #fecdd3;
+    }
+
+    .btn:disabled {
+      opacity: 0.62;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .student-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid rgba(217, 229, 239, 0.92);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 32px rgba(15, 35, 60, 0.08);
+      padding: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+    }
+
+    label {
+      color: #24445f;
+      font-weight: 800;
+      font-size: 0.84rem;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #cbddec;
+      border-radius: 12px;
+      background: #ffffff;
+      color: var(--ink);
+      outline: none;
+      padding: 12px 13px;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.13);
+    }
+
+    /*
+      =============================
+      5. Area de chat
+      =============================
+      Estilo tipo WhatsApp: burbujas, horas y scroll vertical.
+    */
+    .chat-area {
+      min-height: 0;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.78)),
+        radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.12), transparent 12rem),
+        radial-gradient(circle at 80% 0%, rgba(245, 158, 11, 0.12), transparent 13rem);
+      border: 1px solid rgba(217, 229, 239, 0.92);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 1fr;
+    }
+
+    .messages {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 16px;
+      scroll-behavior: smooth;
+    }
+
+    .day-chip {
+      width: fit-content;
+      margin: 0 auto 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid #dbe7f0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .message-row {
+      display: flex;
+      margin: 10px 0;
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .message-row.assistant,
+    .message-row.system {
+      justify-content: flex-start;
+    }
+
+    .bubble {
+      width: fit-content;
+      max-width: min(82%, 680px);
+      border-radius: 18px;
+      padding: 11px 12px 8px;
+      box-shadow: 0 10px 24px rgba(15, 35, 60, 0.10);
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .user .bubble {
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--bubble-user), var(--blue-dark));
+      border-bottom-right-radius: 5px;
+    }
+
+    .assistant .bubble {
+      color: var(--ink);
+      background: var(--bubble-bot);
+      border: 1px solid #dce7ef;
+      border-bottom-left-radius: 5px;
+    }
+
+    .system .bubble {
+      color: #24445f;
+      background: #fff8e5;
+      border: 1px solid #fde68a;
+      border-bottom-left-radius: 5px;
+    }
+
+    .meta {
+      margin-top: 6px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      opacity: 0.78;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .assistant .meta,
+    .system .meta {
+      color: var(--muted);
+    }
+
+    .user .meta {
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .typing {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      min-width: 48px;
+    }
+
+    .typing span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--blue);
+      animation: blink 1s infinite ease-in-out;
+    }
+
+    .typing span:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .typing span:nth-child(3) {
+      animation-delay: 0.30s;
+    }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+      40% { opacity: 1; transform: translateY(-3px); }
+    }
+
+    /*
+      =============================
+      6. Compositor de mensajes
+      =============================
+      En movil el textarea crece poco y mantiene el boton visible.
+    */
+    .composer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+      background: var(--panel);
+      border: 1px solid rgba(217, 229, 239, 0.92);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 32px rgba(15, 35, 60, 0.10);
+      padding: 10px;
+      padding-bottom: var(--safe-bottom);
+    }
+
+    textarea {
+      resize: none;
+      min-height: 48px;
+      max-height: 130px;
+      line-height: 1.35;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin: 6px 0 0;
+      font-weight: 700;
+    }
+
+    /*
+      =============================
+      7. Modal de configuracion
+      =============================
+      La API Key se pide al usuario en una ventana separada.
+    */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: 16px;
+      background: rgba(8, 18, 32, 0.55);
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal {
+      width: min(100%, 560px);
+      max-height: min(92vh, 760px);
+      overflow: auto;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.35);
+      border: 1px solid #dbe7f0;
+      padding: 18px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .modal h2 {
+      margin: 0;
+      color: #12345a;
+      font-size: 1.35rem;
+    }
+
+    .modal p {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .config-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .warning {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #7c2d12;
+      border-radius: 14px;
+      padding: 12px;
+      line-height: 1.45;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #24445f;
+      font-weight: 800;
+      user-select: none;
+    }
+
+    .checkbox-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--blue);
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    /*
+      =============================
+      8. Instrucciones de publicacion
+      =============================
+      Se muestran dentro del archivo, como pide el encargo.
+    */
+    details.instructions {
+      margin-top: 14px;
+      border: 1px solid #dbe7f0;
+      border-radius: 14px;
+      background: #f8fbff;
+      overflow: hidden;
+    }
+
+    details.instructions summary {
+      padding: 12px;
+      cursor: pointer;
+      font-weight: 900;
+      color: #174174;
+    }
+
+    .instructions-body {
+      padding: 0 12px 12px;
+      color: #30465b;
+      line-height: 1.5;
+      font-size: 0.93rem;
+    }
+
+    .instructions-body ol {
+      padding-left: 20px;
+    }
+
+    /*
+      =============================
+      9. Responsive
+      =============================
+      Ajustes para pantallas pequenas.
+    */
+    @media (max-width: 620px) {
+      .app-shell {
+        padding: 8px;
+        gap: 8px;
+      }
+
+      .topbar {
+        align-items: start;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+      }
+
+      .top-actions {
+        flex-direction: column;
+      }
+
+      .top-actions .btn {
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 0.86rem;
+      }
+
+      .student-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .messages {
+        padding: 12px;
+      }
+
+      .bubble {
+        max-width: 92%;
+      }
+
+      .composer {
+        grid-template-columns: 1fr;
+      }
+
+      .composer .btn-primary {
+        width: 100%;
+      }
+
+      .modal-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!--
+    Contenedor principal de la aplicacion.
+    Usa secciones separadas para encabezado, estudiante, conversacion y caja de texto.
+  -->
+  <main class="app-shell" aria-label="Chatbot Educativo CONAMIR">
+    <!-- Encabezado con titulo y botones globales. -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">CE</div>
+        <div>
+          <h1>Chatbot Educativo CONAMIR</h1>
+          <p class="subtitle">Asistente de estudio para secundaria</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="openConfigBtn" class="btn btn-soft" type="button" title="Abrir configuracion">Configurar</button>
+        <button id="clearBtn" class="btn btn-danger" type="button" title="Limpiar conversacion">Limpiar</button>
+      </div>
+    </header>
+
+    <!-- Panel para ingresar y guardar el nombre del estudiante. -->
+    <section class="student-panel" aria-label="Datos del estudiante">
+      <div class="field">
+        <label for="studentName">Nombre del estudiante</label>
+        <input id="studentName" type="text" maxlength="70" autocomplete="name" placeholder="Ej. Maria Perez">
+      </div>
+      <button id="saveNameBtn" class="btn btn-soft" type="button">Guardar nombre</button>
+    </section>
+
+    <!-- Area de conversacion tipo WhatsApp. -->
+    <section class="chat-area" aria-label="Conversacion">
+      <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+    </section>
+
+    <!-- Caja para escribir preguntas. -->
+    <form id="chatForm" class="composer">
+      <div>
+        <label for="questionInput">Escribe tu pregunta</label>
+        <textarea id="questionInput" rows="1" placeholder="Pregunta sobre matematica, comunicacion, ciencia, historia..." required></textarea>
+        <p class="hint">Consejo: escribe preguntas claras, por ejemplo: "Explícame la fotosintesis con un ejemplo".</p>
+      </div>
+      <button id="sendBtn" class="btn btn-primary" type="submit">Enviar</button>
+    </form>
+  </main>
+
+  <!--
+    Modal de configuracion.
+    Aqui el usuario ingresa API Key y modelo. La API Key no se escribe en el codigo.
+  -->
+  <div id="configModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="configTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h2 id="configTitle">Configuracion de OpenAI</h2>
+          <p>Coloca tu API Key para activar el chatbot. Despues podras conversar inmediatamente.</p>
+        </div>
+        <button id="closeConfigBtn" class="btn btn-soft" type="button" aria-label="Cerrar configuracion">Cerrar</button>
+      </div>
+
+      <div class="warning">
+        Seguridad: para una clase completa, lo ideal es usar un servidor intermedio que proteja la API Key.
+        Esta version de un solo HTML guarda la clave solo en este navegador si marcas la opcion de recordar.
+      </div>
+
+      <div class="config-grid">
+        <div class="field">
+          <label for="apiKeyInput">API Key de OpenAI</label>
+          <input id="apiKeyInput" type="password" autocomplete="off" placeholder="Pega aqui tu API Key">
+        </div>
+
+        <div class="field">
+          <label for="modelInput">Modelo</label>
+          <select id="modelInput">
+            <option value="gpt-5.4-mini">gpt-5.4-mini (rapido y economico)</option>
+            <option value="gpt-5.5">gpt-5.5 (mayor capacidad)</option>
+            <option value="gpt-5.4">gpt-5.4</option>
+          </select>
+        </div>
+
+        <label class="checkbox-row">
+          <input id="rememberKeyInput" type="checkbox">
+          Recordar API Key en este navegador
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button id="saveConfigBtn" class="btn btn-primary" type="button">Guardar configuracion</button>
+        <button id="forgetKeyBtn" class="btn btn-danger" type="button">Borrar API Key guardada</button>
+      </div>
+
+      <details class="instructions">
+        <summary>Instrucciones para publicar en GitHub Pages</summary>
+        <div class="instructions-body">
+          <ol>
+            <li>Crea un repositorio publico en GitHub, por ejemplo: <strong>chatbot-educativo-conamir</strong>.</li>
+            <li>Sube este archivo con el nombre exacto <strong>index.html</strong>.</li>
+            <li>Entra a <strong>Settings / Ajustes</strong> del repositorio.</li>
+            <li>Abre <strong>Pages</strong>.</li>
+            <li>En <strong>Source / Fuente</strong>, elige desplegar desde la rama principal y carpeta raiz.</li>
+            <li>Guarda y espera unos segundos a que GitHub publique el enlace.</li>
+            <li>Abre el enlace, toca <strong>Configurar</strong>, pega tu API Key y empieza a usar el chatbot.</li>
+          </ol>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <script>
+    /*
+      ======================================================
+      CHATBOT EDUCATIVO CONAMIR - JavaScript puro
+      ======================================================
+      Este bloque contiene toda la logica:
+      - Manejo de configuracion.
+      - Historial en localStorage.
+      - Renderizado de mensajes.
+      - Llamada a la API de OpenAI Responses.
+    */
+
+    /*
+      =============================
+      1. Claves de localStorage
+      =============================
+      Se centralizan para evitar errores al guardar y leer datos.
+    */
+    const STORAGE_KEYS = {
+      studentName: "conamir_chat_student_name_v1",
+      chatHistory: "conamir_chat_history_v1",
+      apiKey: "conamir_openai_api_key_v1",
+      model: "conamir_openai_model_v1"
+    };
+
+    /*
+      =============================
+      2. Referencias al DOM
+      =============================
+      Guardamos los elementos una sola vez para usarlos en las funciones.
+    */
+    const messagesEl = document.getElementById("messages");
+    const chatForm = document.getElementById("chatForm");
+    const questionInput = document.getElementById("questionInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const studentNameInput = document.getElementById("studentName");
+    const saveNameBtn = document.getElementById("saveNameBtn");
+    const configModal = document.getElementById("configModal");
+    const openConfigBtn = document.getElementById("openConfigBtn");
+    const closeConfigBtn = document.getElementById("closeConfigBtn");
+    const apiKeyInput = document.getElementById("apiKeyInput");
+    const modelInput = document.getElementById("modelInput");
+    const rememberKeyInput = document.getElementById("rememberKeyInput");
+    const saveConfigBtn = document.getElementById("saveConfigBtn");
+    const forgetKeyBtn = document.getElementById("forgetKeyBtn");
+
+    /*
+      =============================
+      3. Estado de la aplicacion
+      =============================
+      El historial vive en memoria y se sincroniza con localStorage.
+    */
+    let chatHistory = [];
+    let runtimeApiKey = "";
+    let isSending = false;
+
+    /*
+      =============================
+      4. Utilidades generales
+      =============================
+      Funciones pequeñas para fechas, almacenamiento y formato.
+    */
+
+    // Devuelve fecha y hora legibles para cada mensaje.
+    function formatDateTime(isoDate) {
+      const date = new Date(isoDate);
+      return date.toLocaleString("es-PE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    // Devuelve solo la fecha para el separador diario del chat.
+    function formatDay(isoDate) {
+      const date = new Date(isoDate);
+      return date.toLocaleDateString("es-PE", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      });
+    }
+
+    // Escapa texto antes de insertarlo en HTML para evitar inyecciones.
+    function escapeHTML(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // Lee JSON de localStorage con proteccion ante datos corruptos.
+    function readJSON(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    // Guarda el historial completo en el navegador.
+    function saveHistory() {
+      localStorage.setItem(STORAGE_KEYS.chatHistory, JSON.stringify(chatHistory));
+    }
+
+    // Obtiene la API Key activa: primero memoria, luego localStorage.
+    function getApiKey() {
+      return runtimeApiKey || localStorage.getItem(STORAGE_KEYS.apiKey) || "";
+    }
+
+    // Obtiene el modelo configurado.
+    function getModel() {
+      return localStorage.getItem(STORAGE_KEYS.model) || modelInput.value || "gpt-5.4-mini";
+    }
+
+    /*
+      =============================
+      5. Renderizado del chat
+      =============================
+      Dibuja mensajes, separadores de fecha y estado de escritura.
+    */
+
+    // Renderiza todos los mensajes del historial.
+    function renderMessages() {
+      messagesEl.innerHTML = "";
+
+      if (chatHistory.length === 0) {
+        addWelcomeMessage();
+        return;
+      }
+
+      let lastDay = "";
+
+      chatHistory.forEach((message) => {
+        const day = formatDay(message.createdAt);
+
+        if (day !== lastDay) {
+          const chip = document.createElement("div");
+          chip.className = "day-chip";
+          chip.textContent = day;
+          messagesEl.appendChild(chip);
+          lastDay = day;
+        }
+
+        messagesEl.appendChild(createMessageElement(message));
+      });
+
+      scrollToBottom();
+    }
+
+    // Crea un elemento visual para un mensaje individual.
+    function createMessageElement(message) {
+      const row = document.createElement("div");
+      row.className = `message-row ${message.role}`;
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+
+      const who = message.role === "user" ? "Estudiante" : message.role === "assistant" ? "Chatbot" : "Sistema";
+      bubble.innerHTML = `
+        <div>${escapeHTML(message.content)}</div>
+        <div class="meta">
+          <span>${who}</span>
+          <span>${formatDateTime(message.createdAt)}</span>
+        </div>
+      `;
+
+      row.appendChild(bubble);
+      return row;
+    }
+
+    // Muestra mensaje inicial cuando el historial esta vacio.
+    function addWelcomeMessage() {
+      const now = new Date().toISOString();
+      const student = studentNameInput.value.trim();
+      const content = student
+        ? `Hola ${student}. Soy tu Chatbot Educativo CONAMIR. Puedes preguntarme sobre tus cursos, tareas o temas que quieras repasar.`
+        : "Hola. Soy tu Chatbot Educativo CONAMIR. Primero escribe tu nombre y configura tu API Key para comenzar.";
+
+      const message = {
+        role: "system",
+        content,
+        createdAt: now
+      };
+
+      messagesEl.appendChild(createMessageElement(message));
+      scrollToBottom();
+    }
+
+    // Agrega un mensaje al historial y actualiza la pantalla.
+    function pushMessage(role, content) {
+      chatHistory.push({
+        role,
+        content,
+        createdAt: new Date().toISOString()
+      });
+      saveHistory();
+      renderMessages();
+    }
+
+    // Muestra una burbuja temporal mientras el modelo responde.
+    function showTyping() {
+      const row = document.createElement("div");
+      row.className = "message-row assistant";
+      row.id = "typingRow";
+      row.innerHTML = `
+        <div class="bubble">
+          <div class="typing" aria-label="El chatbot esta escribiendo">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="meta"><span>Chatbot</span><span>escribiendo...</span></div>
+        </div>
+      `;
+      messagesEl.appendChild(row);
+      scrollToBottom();
+    }
+
+    // Elimina la burbuja temporal de escritura.
+    function hideTyping() {
+      const row = document.getElementById("typingRow");
+      if (row) row.remove();
+    }
+
+    // Baja el scroll al ultimo mensaje.
+    function scrollToBottom() {
+      requestAnimationFrame(() => {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      });
+    }
+
+    /*
+      =============================
+      6. Configuracion
+      =============================
+      Abre/cierra modal, guarda API Key y modelo.
+    */
+
+    // Abre la ventana de configuracion.
+    function openConfig() {
+      apiKeyInput.value = getApiKey();
+      modelInput.value = getModel();
+      rememberKeyInput.checked = Boolean(localStorage.getItem(STORAGE_KEYS.apiKey));
+      configModal.classList.add("open");
+      setTimeout(() => apiKeyInput.focus(), 50);
+    }
+
+    // Cierra la ventana de configuracion.
+    function closeConfig() {
+      configModal.classList.remove("open");
+    }
+
+    // Guarda la configuracion elegida por el usuario.
+    function saveConfig() {
+      const key = apiKeyInput.value.trim();
+      const model = modelInput.value.trim() || "gpt-5.4-mini";
+
+      if (!key) {
+        alert("Pega tu API Key de OpenAI para activar el chatbot.");
+        apiKeyInput.focus();
+        return;
+      }
+
+      runtimeApiKey = key;
+      localStorage.setItem(STORAGE_KEYS.model, model);
+
+      if (rememberKeyInput.checked) {
+        localStorage.setItem(STORAGE_KEYS.apiKey, key);
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.apiKey);
+      }
+
+      closeConfig();
+      renderMessages();
+      alert("Configuracion guardada. Ya puedes conversar con el chatbot.");
+    }
+
+    // Borra la API Key guardada en este navegador.
+    function forgetSavedKey() {
+      runtimeApiKey = "";
+      apiKeyInput.value = "";
+      rememberKeyInput.checked = false;
+      localStorage.removeItem(STORAGE_KEYS.apiKey);
+      alert("API Key borrada de este navegador.");
+    }
+
+    /*
+      =============================
+      7. Preparacion para OpenAI
+      =============================
+      Convierte el historial del chat al formato de entrada de Responses API.
+    */
+
+    // Crea instrucciones del comportamiento educativo del chatbot.
+    function buildInstructions() {
+      const student = studentNameInput.value.trim() || "estudiante";
+
+      return [
+        "Eres el Chatbot Educativo CONAMIR para estudiantes de secundaria.",
+        `El estudiante se llama: ${student}.`,
+        "Responde en espanol claro, amable y motivador.",
+        "Explica paso a paso cuando sea util, pero evita respuestas demasiado largas.",
+        "Usa ejemplos escolares y lenguaje apropiado para secundaria.",
+        "Si el estudiante pide copiar una tarea completa, orienta y explica en lugar de hacer trampa.",
+        "Si no sabes algo con certeza, dilo y sugiere como verificarlo.",
+        "No inventes fuentes ni datos."
+      ].join(" ");
+    }
+
+    // Convierte los ultimos mensajes en items simples para la API.
+    function buildApiInput() {
+      const recent = chatHistory
+        .filter((message) => message.role === "user" || message.role === "assistant")
+        .slice(-12);
+
+      return recent.map((message) => ({
+        role: message.role,
+        content: message.content
+      }));
+    }
+
+    /*
+      =============================
+      8. Llamada a OpenAI
+      =============================
+      Usa fetch directo al endpoint /v1/responses.
+    */
+    async function askOpenAI() {
+      const apiKey = getApiKey();
+
+      if (!apiKey) {
+        openConfig();
+        throw new Error("Falta configurar la API Key de OpenAI.");
+      }
+
+      const response = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: getModel(),
+          instructions: buildInstructions(),
+          input: buildApiInput(),
+          max_output_tokens: 700
+        })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const message = data.error && data.error.message
+          ? data.error.message
+          : `Error HTTP ${response.status}`;
+        throw new Error(message);
+      }
+
+      return extractAssistantText(data);
+    }
+
+    // Extrae texto de la respuesta de OpenAI de forma tolerante a distintas formas de salida.
+    function extractAssistantText(data) {
+      if (data.output_text) {
+        return data.output_text.trim();
+      }
+
+      const textParts = [];
+
+      if (Array.isArray(data.output)) {
+        data.output.forEach((item) => {
+          if (Array.isArray(item.content)) {
+            item.content.forEach((contentItem) => {
+              if (contentItem.text) textParts.push(contentItem.text);
+              if (contentItem.type === "output_text" && contentItem.text) textParts.push(contentItem.text);
+            });
+          }
+        });
+      }
+
+      return textParts.join("\n").trim() || "No pude generar una respuesta. Intenta nuevamente.";
+    }
+
+    /*
+      =============================
+      9. Eventos del usuario
+      =============================
+      Maneja enviar, limpiar, guardar nombre, abrir configuracion y atajos.
+    */
+
+    // Envia una pregunta al chatbot.
+    async function handleSubmit(event) {
+      event.preventDefault();
+
+      if (isSending) return;
+
+      const text = questionInput.value.trim();
+      if (!text) return;
+
+      const student = studentNameInput.value.trim();
+      if (!student) {
+        alert("Primero escribe y guarda el nombre del estudiante.");
+        studentNameInput.focus();
+        return;
+      }
+
+      pushMessage("user", text);
+      questionInput.value = "";
+      autoResizeTextarea();
+
+      try {
+        isSending = true;
+        sendBtn.disabled = true;
+        showTyping();
+        const answer = await askOpenAI();
+        hideTyping();
+        pushMessage("assistant", answer);
+      } catch (error) {
+        hideTyping();
+        pushMessage("system", `No se pudo responder: ${error.message}`);
+      } finally {
+        isSending = false;
+        sendBtn.disabled = false;
+        questionInput.focus();
+      }
+    }
+
+    // Guarda el nombre del estudiante en el navegador.
+    function saveStudentName() {
+      const name = studentNameInput.value.trim();
+      if (!name) {
+        alert("Escribe el nombre del estudiante.");
+        studentNameInput.focus();
+        return;
+      }
+
+      localStorage.setItem(STORAGE_KEYS.studentName, name);
+      renderMessages();
+      alert("Nombre guardado.");
+    }
+
+    // Limpia toda la conversacion, pero conserva nombre y configuracion.
+    function clearConversation() {
+      const ok = confirm("Quieres borrar toda la conversacion guardada en este navegador?");
+      if (!ok) return;
+
+      chatHistory = [];
+      saveHistory();
+      renderMessages();
+      questionInput.focus();
+    }
+
+    // Ajusta automaticamente la altura de la caja de texto.
+    function autoResizeTextarea() {
+      questionInput.style.height = "auto";
+      questionInput.style.height = Math.min(questionInput.scrollHeight, 130) + "px";
+    }
+
+    // En computadoras, Enter envia y Shift+Enter hace salto de linea.
+    function handleQuestionKeydown(event) {
+      if (event.key === "Enter" && !event.shiftKey && window.innerWidth > 620) {
+        event.preventDefault();
+        chatForm.requestSubmit();
+      }
+    }
+
+    /*
+      =============================
+      10. Arranque
+      =============================
+      Carga datos guardados y prepara la interfaz.
+    */
+    function boot() {
+      studentNameInput.value = localStorage.getItem(STORAGE_KEYS.studentName) || "";
+      modelInput.value = localStorage.getItem(STORAGE_KEYS.model) || "gpt-5.4-mini";
+      chatHistory = readJSON(STORAGE_KEYS.chatHistory, []);
+
+      renderMessages();
+
+      if (!getApiKey()) {
+        openConfig();
+      }
+    }
+
+    /*
+      =============================
+      11. Registro de eventos
+      =============================
+      Todos los botones quedan conectados aqui.
+    */
+    chatForm.addEventListener("submit", handleSubmit);
+    saveNameBtn.addEventListener("click", saveStudentName);
+    clearBtn.addEventListener("click", clearConversation);
+    openConfigBtn.addEventListener("click", openConfig);
+    closeConfigBtn.addEventListener("click", closeConfig);
+    saveConfigBtn.addEventListener("click", saveConfig);
+    forgetKeyBtn.addEventListener("click", forgetSavedKey);
+    questionInput.addEventListener("input", autoResizeTextarea);
+    questionInput.addEventListener("keydown", handleQuestionKeydown);
+
+    // Cierra el modal si el usuario toca el fondo oscuro.
+    configModal.addEventListener("click", (event) => {
+      if (event.target === configModal) closeConfig();
+    });
+
+    // Inicia la app cuando el documento ya esta cargado.
+    boot();
+  </script>
+</body>
+</html>

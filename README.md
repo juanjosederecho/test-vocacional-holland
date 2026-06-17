@@ -2,6 +2,10 @@
 
 Abre estos enlaces directamente desde GitHub:
 
+## Chatbot Educativo CONAMIR
+
+[ABRIR CHATBOT EDUCATIVO CONAMIR](https://juanjosederecho.github.io/test-vocacional-holland/chatbot-educativo-conamir/)
+
 ## Examen / pagina antigravity mayo 2026
 
 [ABRIR PAGINA ANTIGRAVITY MAYO 2026](https://juanjosederecho.github.io/test-vocacional-holland/antigravity-mayo-2026/)
